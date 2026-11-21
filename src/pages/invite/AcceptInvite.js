@@ -52,7 +52,6 @@ export default function AcceptInvite() {
     setSaving(true);
     try {
       const res = inviteType === 'teacher' ? await teacherInviteAPI.acceptPublic(token, { password, phone: phone.trim() }) : await studentInviteAPI.acceptPublic(token, { password, phone: phone.trim() });
-      const authData = res.data?.data || {};
       showToast(inviteType === 'student' ? 'Student login created. Redirecting...' : (res.data?.message || 'Teacher login created. Please sign in.'), 'success');
       setTimeout(() => navigate(inviteType === 'student' ? '/student' : '/login', { replace: true }), 900);
       setTimeout(() => navigate('/login', { replace: true }), 900);

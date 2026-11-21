@@ -31,7 +31,7 @@ const StudentLayout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [unread, setUnread] = useState(0);
+  const [, setUnread] = useState(0);
 
   useEffect(() => {
     let active = true;

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { studentPortalAPI } from '../../api/studentPortalApi';
 import useToast from '../../hooks/useToast';
 import '../owner/PremiumOwner.css';
@@ -22,7 +22,7 @@ export default function Messages() {
   const [sending, setSending] = useState(false);
   const { showToast, ToastComponent } = useToast();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [mRes, bRes] = await Promise.all([studentPortalAPI.getMessages(), studentPortalAPI.getBatches()]);
@@ -30,8 +30,8 @@ export default function Messages() {
       setBatches(bRes.data?.data || []);
     } catch (err) { showToast(err.response?.data?.message || 'Failed to load messages'); }
     finally { setLoading(false); }
-  };
-  useEffect(() => { load(); }, []);
+  }, [showToast]);
+  useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
     let active = true;

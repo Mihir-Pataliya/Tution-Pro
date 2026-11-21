@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { studentPortalAPI } from '../../api/studentPortalApi';
 import useToast from '../../hooks/useToast';
 import '../owner/PremiumOwner.css';
@@ -24,7 +24,7 @@ export default function StudyMaterials() {
   const [typeFilter, setTypeFilter] = useState('all');
   const { showToast, ToastComponent } = useToast();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [mRes, bRes] = await Promise.all([studentPortalAPI.getMaterials(), studentPortalAPI.getBatches()]);
@@ -32,8 +32,8 @@ export default function StudyMaterials() {
       setBatches(bRes.data?.data || []);
     } catch (err) { showToast(err.response?.data?.message || 'Failed to load materials'); }
     finally { setLoading(false); }
-  };
-  useEffect(() => { load(); }, []);
+  }, [showToast]);
+  useEffect(() => { load(); }, [load]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { studentPortalAPI } from '../../api/studentPortalApi';
 import useToast from '../../hooks/useToast';
 import '../owner/PremiumOwner.css';
@@ -15,7 +15,7 @@ export default function StudentAssignments() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { showToast, ToastComponent } = useToast();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [aRes, bRes] = await Promise.all([studentPortalAPI.getAssignments(), studentPortalAPI.getBatches()]);
@@ -23,8 +23,8 @@ export default function StudentAssignments() {
       setBatches(bRes.data?.data || []);
     } catch (err) { showToast(err.response?.data?.message || 'Failed to load assignments'); }
     finally { setLoading(false); }
-  };
-  useEffect(() => { load(); }, []);
+  }, [showToast]);
+  useEffect(() => { load(); }, [load]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

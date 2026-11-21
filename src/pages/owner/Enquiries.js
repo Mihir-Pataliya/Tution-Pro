@@ -94,6 +94,7 @@ export default function Enquiries() {
   const counts = useMemo(() => items.reduce((result, item) => { result[item.status] = (result[item.status] || 0) + 1; return result; }, {}), [items]);
 
   return <div className="enquiries-page">
+    <ToastComponent />
     <header className="enquiries-heading"><div><span className="eyebrow">OWNER WORKSPACE</span><h2>Enquiries</h2><p>Track prospective students and keep every follow-up moving.</p></div><div className="enquiries-heading-actions"><button className="enquiry-button secondary" type="button" onClick={load} disabled={loading}>Refresh</button><button className="enquiry-button primary" type="button" onClick={openCreate}>＋ Add enquiry</button></div></header>
     {error && <div className="enquiry-error" role="alert">{error}<button type="button" onClick={load}>Retry</button></div>}
     <section className="enquiry-stats" aria-label="Enquiry status summary">{[['all', 'All enquiries'], ['new', 'New'], ['contacted', 'Contacted'], ['demo_scheduled', 'Demo scheduled'], ['converted', 'Converted'], ['lost', 'Lost']].map(([key, label]) => <button key={key} type="button" className={`enquiry-stat ${statusFilter === key ? 'selected' : ''}`} onClick={() => setStatusFilter(key)}><span>{label}</span><strong>{key === 'all' ? items.length : counts[key] || 0}</strong></button>)}</section>

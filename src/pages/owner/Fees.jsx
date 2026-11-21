@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useToast from '../../hooks/useToast';
 import { feesAPI } from '../../api/feesApi';
 import { studentAPI } from '../../api/studentApi';
@@ -31,7 +31,7 @@ export default function Fees() {
   const [createInstForm, setCreateInstForm] = useState({ studentId: '', totalFee: '', installmentCount: '3' });
   const [creatingInstallment, setCreatingInstallment] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [fRes, sRes, bRes] = await Promise.all([
@@ -49,11 +49,11 @@ export default function Fees() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, showToast]);
 
   useEffect(() => {
     load();
-  }, [filters]);
+  }, [load]);
 
   const filtered = useMemo(() => fees.filter((f) => {
     if (filters.status && f.status !== filters.status) return false;

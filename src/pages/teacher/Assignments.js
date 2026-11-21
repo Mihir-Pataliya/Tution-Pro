@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { teacherAPI } from '../../api/teacherApi';
 import useToast from '../../hooks/useToast';
 import '../owner/PremiumOwner.css';
@@ -20,7 +20,7 @@ export default function Assignments() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { showToast, ToastComponent } = useToast();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [aRes, bRes] = await Promise.all([teacherAPI.getAssignments(), teacherAPI.getBatches()]);
@@ -28,8 +28,8 @@ export default function Assignments() {
       setBatches(bRes.data?.data || []);
     } catch (err) { showToast(err.response?.data?.message || 'Failed to load assignments'); }
     finally { setLoading(false); }
-  };
-  useEffect(() => { load(); }, []);
+  }, [showToast]);
+  useEffect(() => { load(); }, [load]);
 
   const reset = () => { setForm(emptyForm); setEditing(null); setFormOpen(false); };
   const openAdd = () => { setEditing(null); setForm(emptyForm); setFormOpen(true); };

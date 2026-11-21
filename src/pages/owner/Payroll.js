@@ -4,7 +4,6 @@ import useToast from '../../hooks/useToast';
 import './Payroll.css';
 
 const toINR = (v) => `₹${Number(v || 0).toLocaleString()}`;
-const formatDate = (d) => (d ? new Date(d).toLocaleDateString() : '—');
 
 export default function Payroll() {
   const { showToast, ToastComponent } = useToast();

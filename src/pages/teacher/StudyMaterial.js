@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { teacherAPI } from '../../api/teacherApi';
 import useToast from '../../hooks/useToast';
 import '../owner/PremiumOwner.css';
@@ -31,7 +31,7 @@ export default function StudyMaterial() {
   const [typeFilter, setTypeFilter] = useState('all');
   const { showToast, ToastComponent } = useToast();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [mRes, bRes] = await Promise.all([teacherAPI.getMaterials(), teacherAPI.getBatches()]);
@@ -39,8 +39,8 @@ export default function StudyMaterial() {
       setBatches(bRes.data?.data || []);
     } catch (err) { showToast(err.response?.data?.message || 'Failed to load materials'); }
     finally { setLoading(false); }
-  };
-  useEffect(() => { load(); }, []);
+  }, [showToast]);
+  useEffect(() => { load(); }, [load]);
 
   const submit = async (e) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { teacherAPI } from '../../api/teacherApi';
 import useToast from '../../hooks/useToast';
@@ -27,7 +27,7 @@ export default function Profile() {
   const [showNext, setShowNext] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await teacherAPI.getProfile();
@@ -35,8 +35,8 @@ export default function Profile() {
       setProfile({ name: u.name || '', phone: u.phone || '', subject: u.subject || '', email: u.email || '' });
     } catch (err) { showToast(err.response?.data?.message || 'Failed to load profile'); }
     finally { setLoading(false); }
-  };
-  useEffect(() => { load(); }, []);
+  }, [showToast]);
+  useEffect(() => { load(); }, [load]);
 
   const saveProfile = async (e) => {
     e.preventDefault();

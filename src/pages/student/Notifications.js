@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { studentPortalAPI } from '../../api/studentPortalApi';
 import useToast from '../../hooks/useToast';
 import '../owner/PremiumOwner.css';
@@ -9,7 +9,7 @@ export default function Notifications() {
   const [loading, setLoading] = useState(true);
   const { showToast, ToastComponent } = useToast();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await studentPortalAPI.getMessages();
@@ -19,9 +19,9 @@ export default function Notifications() {
       setMessages(inbox);
     } catch (err) { showToast(err.response?.data?.message || 'Failed to load notifications'); }
     finally { setLoading(false); }
-  };
+  }, [showToast]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const markRead = async (id) => {
     try { await studentPortalAPI.markMessageRead(id); load(); } catch (err) { /* ignore */ }
