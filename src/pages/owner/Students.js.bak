@@ -1,0 +1,190 @@
+import React, { useState, useEffect } from 'react';
+import { studentAPI, batchAPI } from '../../api/auth';
+import useToast from '../../hooks/useToast';
+import AddEditStudentModal from './AddEditStudentModal';
+import './Students.css';
+
+const StudentsPage = () => {
+  const [students, setStudents] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [filterBatch, setFilterBatch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [editingStudent, setEditingStudent] = useState(null);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [studentsRes, batchesRes] = await Promise.all([
+        studentAPI.getAll(),
+        batchAPI.getAll(),
+      ]);
+      const studentsData = studentsRes.data?.data ?? studentsRes.data;
+      const batchesData = batchesRes.data?.data ?? batchesRes.data;
+      setStudents(Array.isArray(studentsData) ? studentsData : []);
+      setBatches(Array.isArray(batchesData) ? batchesData : []);
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredStudents = students.filter(student =>
+    !filterBatch || (student.batchId?._id || student.batchId) === filterBatch
+  );
+
+  const handleCreate = async (data) => {
+    try {
+      await studentAPI.create(data);
+      setShowModal(false);
+      setEditingStudent(null);
+      showToast('Student created successfully', 'success');
+      fetchData();
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to create student');
+    }
+  };
+
+  const handleUpdate = async (id, data) => {
+    try {
+      await studentAPI.update(id, data);
+      setShowModal(false);
+      setEditingStudent(null);
+      showToast('Student updated successfully', 'success');
+      fetchData();
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to update student');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this student?')) return;
+    try {
+      await studentAPI.delete(id);
+      showToast('Student deleted successfully', 'success');
+      fetchData();
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to delete student');
+    }
+  };
+
+  const generateReportLink = (reportToken) => {
+    return `${window.location.origin}/report/${reportToken}`;
+  };
+
+  return (
+    <div className='students-page'>
+      <h2>Students</h2>
+      <div className='page-header'>
+        <div className='search-filter'>
+          <select
+            value={filterBatch}
+            onChange={(e) => setFilterBatch(e.target.value)}
+          >
+            <option value=''>All Batches</option>
+            {batches.map(batch => (
+              <option key={batch._id} value={batch._id}>
+                {batch.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          type='button'
+          className='btn-primary'
+          onClick={() => {
+            setEditingStudent(null);
+            setShowModal(true);
+          }}
+        >
+          + Add Student
+        </button>
+      </div>
+
+      <div className='table-responsive'>
+        <table className='data-table'>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Batch</th>
+              <th>Parent</th>
+              <th>Monthly Fee</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan='5'>Loading...</td>
+              </tr>
+            ) : filteredStudents.length === 0 ? (
+              <tr>
+                <td colSpan='5'>No students found</td>
+              </tr>
+            ) : (
+              filteredStudents.map(student => (
+                <tr key={student._id}>
+                  <td>{student.name}</td>
+                  <td>
+                    {student.batchId?.name || batches.find((b) => b._id === (student.batchId?._id || student.batchId))?.name || 'N/A'}
+                  </td>
+                  <td>{student.parentName}</td>
+                  <td>₹{student.monthlyFee}</td>
+                  <td className='actions'>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setEditingStudent(student);
+                        setShowModal(true);
+                      }}
+                      className='btn-sm btn-edit'
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(student._id)}
+                      className='btn-sm btn-danger'
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          generateReportLink(student.reportToken || '')
+                        );
+                        showToast('Report link copied!', 'success');
+                      }}
+                      className='btn-sm btn-info'
+                    >
+                      Copy Link
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {showModal && (
+        <AddEditStudentModal
+          batches={batches}
+          student={editingStudent}
+          onSave={editingStudent ? (data) => handleUpdate(editingStudent._id, data) : handleCreate}
+          onClose={() => {
+            setShowModal(false);
+            setEditingStudent(null);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default StudentsPage;

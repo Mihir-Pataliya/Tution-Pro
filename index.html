@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TuitionPro — Run your tuition institute smarter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-2: #7c3aed;
+  --accent: #ec4899;
+  --bg: #f7f6ff;
+  --bg-2: #ffffff;
+  --text: #0f1030;
+  --text-soft: #4b4c6a;
+  --card: #ffffff;
+  --border: rgba(79,70,229,0.12);
+  --shadow: 0 20px 50px -20px rgba(79,70,229,0.35);
+  --shadow-soft: 0 10px 30px -15px rgba(79,70,229,0.25);
+  --glass: rgba(255,255,255,0.6);
+  --nav-bg: rgba(247,246,255,0.7);
+  --sidebar: #0f1030;
+  --success: #16a34a;
+  --radius: 18px;
+  --radius-lg: 26px;
+}
+[data-theme="dark"] {
+  --bg: #0a0a1f;
+  --bg-2: #12123a;
+  --text: #eef0ff;
+  --text-soft: #a8a9c6;
+  --card: #15153d;
+  --border: rgba(255,255,255,0.08);
+  --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+  --shadow-soft: 0 10px 30px -15px rgba(0,0,0,0.4);
+  --glass: rgba(20,20,50,0.6);
+  --nav-bg: rgba(10,10,31,0.7);
+  --sidebar: #080818;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: hidden; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  transition: background .3s, color .3s;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.gradient-text { background: linear-gradient(120deg, #4f46e5, #7c3aed, #ec4899); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradMove 4s linear infinite; }
+@keyframes gradMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; border-radius: 14px; font-weight: 700; font-size: 15px; position: relative; overflow: hidden; transition: transform .2s, box-shadow .2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn-primary { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; box-shadow: 0 12px 30px -10px rgba(79,70,229,.5); }
+.btn-ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+.btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent); animation: shine 4s infinite; }
+@keyframes shine { 0%{left:-100%} 50%{left:100%} 100%{left:100%} }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; background: rgba(79,70,229,.08); color: var(--primary); font-size: 13px; font-weight: 600; border: 1px solid var(--border); }
+
+/* scroll progress */
+#scrollProgress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: linear-gradient(90deg, #4f46e5, #ec4899); z-index: 200; transition: width .1s linear; }
+
+/* navbar */
+.nav { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background: var(--nav-bg); transition: box-shadow .3s; }
+.nav.scrolled { box-shadow: 0 8px 30px -15px rgba(0,0,0,.2); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 20px; }
+.logo { font-weight: 800; font-size: 20px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+.logo-mark { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: grid; place-items: center; color: #fff; font-weight: 800; }
+.nav-links { display: flex; gap: 28px; font-weight: 600; font-size: 14px; color: var(--text-soft); }
+.nav-links a:hover { color: var(--primary); }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.theme-toggle { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--card); border: 1px solid var(--border); font-size: 18px; }
+
+/* blobs */
+.blob-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .5; animation: float 12s ease-in-out infinite; }
+.blob1 { width: 400px; height: 400px; background: #4f46e5; top: -100px; left: -100px; }
+.blob2 { width: 350px; height: 350px; background: #ec4899; top: 50px; right: -80px; animation-delay: -4s; }
+.blob3 { width: 300px; height: 300px; background: #7c3aed; bottom: -50px; left: 40%; animation-delay: -8s; }
+@keyframes float { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(40px,-30px) scale(1.05)} 66%{transform:translate(-30px,40px) scale(.95)} }
+
+/* hero */
+.hero { position: relative; padding: 80px 0 60px; }
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
+.hero h1 { font-size: clamp(36px, 5vw, 60px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; margin: 18px 0; }
+.hero-sub { font-size: 18px; color: var(--text-soft); margin-bottom: 28px; min-height: 28px; }
+.hero-sub .typing { color: var(--primary); font-weight: 700; }
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+.ticks { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; color: var(--text-soft); font-weight: 600; }
+.ticks span::before { content: '✓'; color: var(--success); font-weight: 800; margin-right: 6px; }
+
+/* dashboard mock */
+.dash { background: var(--card); border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transform-style: preserve-3d; transition: transform .15s ease; }
+.dash-inner { display: grid; grid-template-columns: 150px 1fr; min-height: 360px; }
+.dash-side { background: var(--sidebar); color: #fff; padding: 18px 12px; font-size: 13px; }
+.dash-side .side-logo { font-weight: 800; margin-bottom: 18px; font-size: 15px; }
+.side-item { padding: 9px 12px; border-radius: 10px; margin-bottom: 4px; color: #b8b9d6; }
+.side-item.active { background: rgba(79,70,229,.25); color: #fff; }
+.dash-main { padding: 18px; }
+.dash-greet { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+.stat-card { background: var(--bg); border-radius: 12px; padding: 10px 12px; border: 1px solid var(--border); }
+.stat-card .lbl { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; }
+.stat-card .val { font-size: 15px; font-weight: 800; margin-top: 2px; }
+.chart { display: flex; align-items: flex-end; gap: 8px; height: 110px; padding-top: 8px; }
+.bar { flex: 1; background: linear-gradient(180deg, #4f46e5, #7c3aed); border-radius: 6px 6px 0 0; height: 0; transition: height 1.2s cubic-bezier(.2,.8,.2,1); }
+.toast { position: absolute; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-soft); padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; animation: toastIn .4s; }
+.toast1 { top: 12px; right: -10px; }
+.toast2 { bottom: 12px; left: -10px; }
+@keyframes toastIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* marquee */
+.marquee-wrap { overflow: hidden; padding: 22px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 20px 0; background: var(--bg-2); }
+.marquee { display: flex; gap: 40px; width: max-content; animation: scroll 30s linear infinite; }
+.marquee:hover { animation-play-state: paused; }
+.marquee span { font-weight: 700; font-size: 18px; white-space: nowrap; }
+@keyframes scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* sections */
+section { padding: 80px 0; }
+.section-head { text-align: center; max-width: 700px; margin: 0 auto 50px; }
+.section-head h2 { font-size: clamp(30px, 4vw, 44px); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 12px; }
+.section-head p { color: var(--text-soft); font-size: 17px; }
+
+/* stats row */
+.stats-big { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 50px; }
+.stat-big { text-align: center; padding: 24px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-soft); }
+.stat-big .num { font-size: 34px; font-weight: 800; background: linear-gradient(135deg,#4f46e5,#7c3aed); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.stat-big .lbl { color: var(--text-soft); font-size: 14px; font-weight: 600; margin-top: 4px; }
+
+/* features */
+.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+.feat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; position: relative; overflow: hidden; transition: transform .25s, box-shadow .25s; cursor: pointer; }
+.feat:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+.feat .icon { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; background: linear-gradient(135deg, rgba(79,70,229,.12), rgba(236,72,153,.12)); margin-bottom: 16px; transition: transform .3s; }
+.feat:hover .icon { transform: rotate(8deg) scale(1.1); }
+.feat h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.feat p { color: var(--text-soft); font-size: 14px; }
+.spotlight { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s; background: radial-gradient(400px circle at var(--x,50%) var(--y,50%), rgba(79,70,229,.12), transparent 40%); }
+.feat:hover .spotlight { opacity: 1; }
+
+/* pricing */
+.pricing-toggle { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 40px; font-weight: 600; }
+.toggle { width: 52px; height: 28px; background: var(--border); border-radius: 999px; position: relative; transition: background .3s; }
+.toggle.on { background: linear-gradient(135deg,#4f46e5,#7c3aed); }
+.toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; background: #fff; border-radius: 50%; transition: transform .3s; }
+.toggle.on::after { transform: translateX(24px); }
+.plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: stretch; }
+.plan { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 30px; position: relative; transition: transform .25s; }
+.plan.popular { transform: scale(1.05); border: 2px solid transparent; background: linear-gradient(var(--card),var(--card)) padding-box, linear-gradient(135deg,#4f46e5,#ec4899) border-box; box-shadow: 0 30px 60px -20px rgba(79,70,229,.4); }
+.popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg,#4f46e5,#ec4899); color: #fff; padding: 6px 16px; border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: 1px; }
+.plan h3 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.plan .price { font-size: 42px; font-weight: 800; margin: 14px 0 4px; letter-spacing: -1.5px; }
+.plan .price span { font-size: 16px; font-weight: 600; color: var(--text-soft); }
+.plan .sub { color: var(--text-soft); font-size: 13px; margin-bottom: 20px; }
+.plan ul { list-style: none; margin-bottom: 24px; }
+.plan ul li { padding: 8px 0; font-size: 14px; display: flex; gap: 8px; }
+.plan ul li::before { content: '✓'; color: var(--success); font-weight: 800; }
+.plan .btn { width: 100%; justify-content: center; }
+
+/* testimonials */
+.testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+.testi { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow-soft); }
+.stars { color: #f59e0b; font-size: 16px; margin-bottom: 12px; }
+.testi q { display: block; color: var(--text); font-size: 15px; line-height: 1.6; margin-bottom: 18px; }
+.testi .who { display: flex; align-items: center; gap: 12px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; background: linear-gradient(135deg,#4f46e5,#ec4899); }
+.who .name { font-weight: 700; font-size: 14px; }
+.who .inst { font-size: 12px; color: var(--text-soft); }
+
+/* faq */
+.faq { max-width: 760px; margin: 0 auto; }
+.faq-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+.faq-q { padding: 18px 22px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.faq-q:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; color: var(--text-soft); }
+.faq-a-inner { padding: 0 22px 18px; }
+.faq-item.open .faq-a { max-height: 300px; }
+.faq-item .chev { transition: transform .3s; }
+.faq-item.open .chev { transform: rotate(180deg); }
+
+/* cta */
+.cta { background: linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899); background-size: 200% 200%; animation: gradMove 6s linear infinite; border-radius: var(--radius-lg); padding: 60px 40px; text-align: center; color: #fff; position: relative; overflow: hidden; margin: 20px 0; }
+.cta h2 { font-size: clamp(28px,4vw,44px); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 12px; }
+.cta p { opacity: .9; margin-bottom: 26px; }
+.cta .btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.cta .btn-ghost { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.3); }
+.circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,.15); animation: float 8s ease-in-out infinite; }
+.c1 { width: 120px; height: 120px; top: -30px; left: -30px; }
+.c2 { width: 80px; height: 80px; bottom: -20px; right: 60px; animation-delay: -3s; }
+.c3 { width: 60px; height: 60px; top: 40px; right: -20px; animation-delay: -5s; }
+
+/* footer */
+footer { background: var(--bg-2); border-top: 1px solid var(--border); padding: 60px 0 30px; }
+.foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+.foot-grid h4 { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.foot-grid ul { list-style: none; }
+.foot-grid li { margin-bottom: 8px; font-size: 14px; color: var(--text-soft); }
+.foot-grid li a:hover { color: var(--primary); }
+.foot-bottom { border-top: 1px solid var(--border); padding-top: 20px; text-align: center; color: var(--text-soft); font-size: 13px; }
+
+/* reveal */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* whatsapp */
+.wa { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; border-radius: 50%; background: #25D366; color: #fff; display: grid; place-items: center; font-size: 30px; box-shadow: 0 12px 30px -8px rgba(37,211,102,.6); z-index: 150; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 12px 30px -8px rgba(37,211,102,.6)} 50%{box-shadow:0 12px 40px -4px rgba(37,211,102,.9)} }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+
+@media (max-width: 900px) {
+  .hero-grid, .plans, .testi-grid, .features-grid, .stats-big, .foot-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .dash-inner { grid-template-columns: 1fr; }
+  .dash-side { display: none; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .plan.popular { transform: none; }
+}
+</style>
+</head>
+<body>
+<div id="scrollProgress"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="container nav-inner">
+    <div class="logo"><div class="logo-mark">T</div> TuitionPro</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="btn btn-ghost">Login</button>
+      <button class="btn btn-primary btn-shine">Start free trial</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob-wrap">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+  </div>
+  <div class="container hero-grid">
+    <div>
+      <div class="pill">✨ Trusted by 500+ tuition institutes</div>
+      <h1>Run your tuition institute <span class="gradient-text">smarter</span> with TuitionPro</h1>
+      <div class="hero-sub">Manage <span class="typing" id="typing"></span></div>
+      <div class="hero-btns">
+        <button class="btn btn-primary btn-shine">Get started free trial</button>
+        <button class="btn btn-ghost">▶ Watch demo</button>
+      </div>
+      <div class="ticks">
+        <span>No credit card</span>
+        <span>Free 14-day trial</span>
+        <span>Easy setup</span>
+      </div>
+    </div>
+    <div class="dash" id="dash">
+      <div class="toast toast1" id="toast1">✅ Attendance saved</div>
+      <div class="toast toast2" id="toast2">💰 Fee received +₹5,000</div>
+      <div class="dash-inner">
+        <div class="dash-side">
+          <div class="side-logo">TuitionPro</div>
+          <div class="side-item active">Dashboard</div>
+          <div class="side-item">Students</div>
+          <div class="side-item">Batches</div>
+          <div class="side-item">Attendance</div>
+          <div class="side-item">Fees</div>
+          <div class="side-item">Reports</div>
+        </div>
+        <div class="dash-main">
+          <div class="dash-greet">Good morning, Owner 👋</div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="lbl">Students</div><div class="val">248</div></div>
+            <div class="stat-card"><div class="lbl">Batches</div><div class="val">16</div></div>
+            <div class="stat-card"><div class="lbl">Collected</div><div class="val">₹1,25,000</div></div>
+            <div class="stat-card"><div class="lbl">Pending</div><div class="val">₹32,000</div></div>
+          </div>
+          <div class="chart" id="chart">
+            <div class="bar" data-h="40"></div>
+            <div class="bar" data-h="65"></div>
+            <div class="bar" data-h="55"></div>
+            <div class="bar" data-h="80"></div>
+            <div class="bar" data-h="70"></div>
+            <div class="bar" data-h="90"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>📚 Student Management</span><span>✅ Smart Attendance</span><span>💰 Fees & Receipts</span><span>📞 Enquiry Tracking</span><span>💬 WhatsApp Alerts</span><span>📊 Reports & Analytics</span><span>👥 Multi-branch</span><span>🔒 Data Backup</span>
+    <span>📚 Student Management</span><span>✅ Smart Attendance</span><span>💰 Fees & Receipts</span><span>📞 Enquiry Tracking</span><span>💬 WhatsApp Alerts</span><span>📊 Reports & Analytics</span><span>👥 Multi-branch</span><span>🔒 Data Backup</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="section-head">
+      <h2>Everything you need to grow your institute</h2>
+      <p>One platform to manage students, batches, attendance, fees and more.</p>
+    </div>
+    <div class="stats-big">
+      <div class="stat-big"><div class="num" data-count="500" data-suffix="+">0</div><div class="lbl">institutes</div></div>
+      <div class="stat-big"><div class="num" data-count="90" data-suffix="% less paperwork">0</div><div class="lbl">efficiency</div></div>
+      <div class="stat-big"><div class="num" data-count="2" data-suffix="x faster fee collection">0</div><div class="lbl">speed</div></div>
+      <div class="stat-big"><div class="num" data-count="2" data-suffix=" min attendance per batch">0</div><div class="lbl">time</div></div>
+    </div>
+    <div class="features-grid">
+      <div class="feat reveal"><div class="spotlight"></div><div class="icon">👨‍🎓</div><h3>Student management</h3><p>Add, edit and track every student's profile, batch and history.</p></div>
+      <div class="feat reveal"><div class="spotlight"></div><div class="icon">✅</div><h3>Smart attendance</h3><p>Mark attendance in 2 minutes per batch with quick toggles.</p></div>
+      <div class="feat reveal"><div class="spotlight"></div><div class="icon">💰</div><h3>Fees & receipts</h3><p>Collect fees, generate receipts and track pending dues.</p></div>
+      <div class="feat reveal"><div class="spotlight"></div><div class="icon">📞</div><h3>Enquiry tracking</h3><p>Capture leads and follow up until they convert.</p></div>
+      <div class="feat reveal"><div class="spotlight"></div><div class="icon">💬</div><h3>WhatsApp alerts</h3><p>Auto reminders for fees and attendance to parents.</p></div>
+      <div class="feat reveal"><div class="spotlight"></div><div class="icon">📊</div><h3>Reports & analytics</h3><p>Insights on revenue, attendance and growth.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <h2>Simple, transparent pricing</h2>
+      <p>Start free. Upgrade when you grow.</p>
+    </div>
+    <div class="pricing-toggle">
+      <span>Monthly</span>
+      <div class="toggle" id="toggle"></div>
+      <span>Yearly <span style="color:var(--accent);font-size:12px">(save 20%)</span></span>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>Starter</h3>
+        <div class="price" data-monthly="499" data-yearly="399">₹499<span>/mo</span></div>
+        <div class="sub">For small institutes</div>
+        <ul>
+          <li>100 students</li><li>3 batches</li><li>Attendance + fees</li><li>Enquiry tracking</li><li>Email support</li>
+        </ul>
+        <button class="btn btn-ghost">Get started</button>
+      </div>
+      <div class="plan popular">
+        <div class="popular-badge">MOST POPULAR</div>
+        <h3>Pro</h3>
+        <div class="price" data-monthly="999" data-yearly="799">₹999<span>/mo</span></div>
+        <div class="sub">For growing institutes</div>
+        <ul>
+          <li>500 students</li><li>Unlimited batches</li><li>Receipts + reminders</li><li>Reports & analytics</li><li>WhatsApp alerts</li><li>Priority support</li>
+        </ul>
+        <button class="btn btn-primary btn-shine">Get started</button>
+      </div>
+      <div class="plan">
+        <h3>Institute</h3>
+        <div class="price" data-monthly="1999" data-yearly="1599">₹1,999<span>/mo</span></div>
+        <div class="sub">For large institutes</div>
+        <ul>
+          <li>Unlimited students</li><li>Multi-branch + staff roles</li><li>Advanced reports</li><li>Data backup</li><li>Dedicated manager</li>
+        </ul>
+        <button class="btn btn-ghost">Get started</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-head">
+      <h2>Loved by institute owners</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi reveal">
+        <div class="stars">★★★★★</div>
+        <q>TuitionPro cut our paperwork by 90%. Fee collection is 2x faster now.</q>
+        <div class="who"><div class="avatar">RK</div><div><div class="name">Ramesh Kumar</div><div class="inst">Bright Minds Academy, Delhi</div></div></div>
+      </div>
+      <div class="testi reveal">
+        <div class="stars">★★★★★</div>
+        <q>Attendance that took 30 minutes now takes 2 minutes per batch.</q>
+        <div class="who"><div class="avatar">PS</div><div><div class="name">Priya Sharma</div><div class="inst">Excel Tuition Centre, Pune</div></div></div>
+      </div>
+      <div class="testi reveal">
+        <div class="stars">★★★★★</div>
+        <q>Parents love the WhatsApp reminders. Enquiries convert faster.</q>
+        <div class="who"><div class="avatar">AM</div><div><div class="name">Amit Mehta</div><div class="inst">Success Point, Mumbai</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="section-head">
+      <h2>Frequently asked questions</h2>
+    </div>
+    <div class="faq">
+      <div class="faq-item open">
+        <div class="faq-q" tabindex="0">Is there a free trial? <span class="chev">▾</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Yes! 14-day free trial, no credit card required.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" tabindex="0">How long does setup take? <span class="chev">▾</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Most institutes are up and running in under 10 minutes.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" tabindex="0">Can I cancel anytime? <span class="chev">▾</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Absolutely. Cancel anytime, no questions asked.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="container">
+    <div class="cta">
+      <div class="circle c1"></div><div class="circle c2"></div><div class="circle c3"></div>
+      <h2>Ready to run your institute smarter?</h2>
+      <p>Join 500+ institutes already using TuitionPro.</p>
+      <div class="btns">
+        <button class="btn btn-primary btn-shine" style="background:#fff;color:#4f46e5">Get started</button>
+        <button class="btn btn-ghost">Login</button>
+      </div>
+      <div style="margin-top:18px;font-size:13px;opacity:.85">No credit card • Free 14-day trial • Cancel anytime</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="logo"><div class="logo-mark">T</div> TuitionPro</div>
+        <p style="color:var(--text-soft);font-size:14px;margin-top:12px">Management platform for tuition institutes in India.</p>
+      </div>
+      <div><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#">Pricing</a></li><li><a href="#">Demo</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Contact</a></li></ul></div>
+      <div><h4>Get started</h4><ul><li><a href="#">Free trial</a></li><li><a href="#">Login</a></li><li><a href="#">Support</a></li></ul></div>
+    </div>
+    <div class="foot-bottom">© 2026 TuitionPro. All rights reserved.</div>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/919999999999" aria-label="WhatsApp">💬</a>
+
+<script>
+// theme
+const root = document.documentElement;
+const toggle = document.getElementById('themeToggle');
+function applyTheme(t){ root.setAttribute('data-theme', t); toggle.textContent = t==='dark'?'☀️':'🌙'; localStorage.setItem('theme',t); }
+const saved = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+applyTheme(saved);
+toggle.addEventListener('click', ()=> applyTheme(root.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+// scroll progress + nav shadow
+const sp = document.getElementById('scrollProgress');
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = (h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
+  sp.style.width = pct+'%';
+  nav.classList.toggle('scrolled', h.scrollTop>20);
+});
+
+// typing effect
+const words = ['Fees.','Attendance.','Enquiries.','Reports.'];
+const typing = document.getElementById('typing');
+let wi=0, ci=0, deleting=false;
+function typeLoop(){
+  const w = words[wi];
+  if(!deleting){ typing.textContent = w.slice(0,ci+1); ci++; if(ci===w.length){ deleting=true; setTimeout(typeLoop,1200); return;} }
+  else { typing.textContent = w.slice(0,ci-1); ci--; if(ci===0){ deleting=false; wi=(wi+1)%words.length;} }
+  setTimeout(typeLoop, deleting?60:110);
+}
+typeLoop();
+
+// toast rotation
+const toasts = [['✅ Attendance saved','💰 Fee received +₹5,000'],['💰 Fee received +₹5,000','✅ Attendance saved']];
+let ti=0;
+setInterval(()=>{ ti=(ti+1)%toasts.length; document.getElementById('toast1').textContent=toasts[ti][0]; document.getElementById('toast2').textContent=toasts[ti][1]; },3000);
+
+// dashboard 3d tilt
+const dash = document.getElementById('dash');
+dash.addEventListener('mousemove', e=>{
+  const r = dash.getBoundingClientRect();
+  const x = (e.clientX-r.left)/r.width - .5;
+  const y = (e.clientY-r.top)/r.height - .5;
+  dash.style.transform = `perspective(900px) rotateY(${x*12}deg) rotateX(${-y*12}deg)`;
+});
+dash.addEventListener('mouseleave', ()=> dash.style.transform='perspective(900px) rotateY(0) rotateX(0)');
+
+// chart grow
+window.addEventListener('load', ()=>{
+  document.querySelectorAll('#chart .bar').forEach((b,i)=>{
+    setTimeout(()=>{ b.style.height = b.dataset.h+'%'; }, 200+i*120);
+  });
+});
+
+// count-up
+const counters = document.querySelectorAll('[data-count]');
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      const el=en.target; const target=+el.dataset.count; const suffix=el.dataset.suffix||''; let v=0;
+      const step = ()=>{ v+=Math.ceil(target/40); if(v>=target){ v=target; el.textContent=target+suffix; return;} el.textContent=v+suffix; requestAnimationFrame(step); };
+      step(); io.unobserve(el);
+    }
+  });
+},{threshold:.4});
+counters.forEach(c=>io.observe(c));
+
+// reveal
+const rev = new IntersectionObserver(entries=>{
+  entries.forEach((en,i)=>{ if(en.isIntersecting){ setTimeout(()=>en.target.classList.add('in'), i*80); rev.unobserve(en.target);} });
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(e=>rev.observe(e));
+
+// spotlight
+document.querySelectorAll('.feat').forEach(f=>{
+  f.addEventListener('mousemove', e=>{
+    const r=f.getBoundingClientRect();
+    f.style.setProperty('--x', (e.clientX-r.left)+'px');
+    f.style.setProperty('--y', (e.clientY-r.top)+'px');
+  });
+});
+
+// pricing toggle
+const ptoggle = document.getElementById('toggle');
+let yearly=false;
+ptoggle.addEventListener('click', ()=>{
+  yearly=!yearly; ptoggle.classList.toggle('on',yearly);
+  document.querySelectorAll('.price').forEach(p=>{
+    const v = yearly? p.dataset.yearly : p.dataset.monthly;
+    p.firstChild.textContent = '₹'+Number(v).toLocaleString('en-IN');
+  });
+});
+
+// faq accordion
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click', ()=> q.parentElement.classList.toggle('open'));
+  q.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); q.parentElement.classList.toggle('open'); }});
+});
+</script>
+</body>
+</html>

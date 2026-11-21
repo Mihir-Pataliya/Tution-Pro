@@ -1,0 +1,33 @@
+.fees-page { display:flex; flex-direction:column; gap:16px; }
+.page-header { display:flex; align-items:center; justify-content:space-between; }
+.header-actions { display:flex; gap:8px; }
+.summary-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+.summary-card { background:#fff; border:1px solid #eef1f7; border-radius:10px; padding:14px; box-shadow:0 1px 2px #00000005; }
+.summary-card h3 { margin:0; font-size:12px; color:#6b7280; }
+.summary-card p { margin:6px 0 0; font-size:22px; font-weight:700; }
+.filters { display:flex; gap:8px; flex-wrap:wrap; background:#fff; padding:10px; border:1px solid #eef1f7; border-radius:10px; }
+.filters select, .filters input { padding:8px; border:1px solid #dce1ed; border-radius:8px; }
+.form-panel { background:#fff; border:1px solid #eef1f7; border-radius:10px; padding:12px; }
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group.full { grid-column:1/-1; }
+.form-group label { font-size:12px; color:#374151; }
+.form-group input, .form-group select { padding:8px; border:1px solid #dce1ed; border-radius:8px; }
+.form-actions { grid-column:1/-1; display:flex; gap:8px; }
+.table-wrap { background:#fff; border:1px solid #eef1f7; border-radius:10px; overflow:auto; }
+.data-table { width:100%; border-collapse:collapse; min-width:900px; }
+.data-table th, .data-table td { padding:10px; border-bottom:1px solid #f1f4f9; text-align:left; font-size:13px; }
+.data-table th { background:#f8fafc; font-weight:600; }
+.actions { display:flex; gap:6px; flex-wrap:wrap; }
+.btn { padding:8px 12px; border:1px solid #dce1ed; border-radius:8px; background:#fff; cursor:pointer; }
+.btn-primary { background:#4f46e5; color:#fff; border-color:#4f46e5; }
+.btn-sm { padding:4px 8px; border:1px solid #dce1ed; border-radius:6px; background:#fff; font-size:11px; cursor:pointer; }
+.btn-success { border-color:#22c55e; color:#16a34a; }
+.btn-danger { border-color:#fecaca; color:#dc2626; }
+.btn-ghost { border-color:#e2e8f0; color:#475569; }
+.badge { padding:4px 8px; border-radius:999px; font-size:11px; text-transform:capitalize; }
+.badge.paid { background:#dcfce7; color:#166534; }
+.badge.pending { background:#fef3c7; color:#92400e; }
+.badge.overdue { background:#fee2e2; color:#991b1b; }
+.badge.partial { background:#e0f2fe; color:#075985; }
+.empty { padding:16px; text-align:center; color:#6b7280; }

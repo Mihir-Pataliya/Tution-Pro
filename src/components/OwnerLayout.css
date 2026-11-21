@@ -1,0 +1,54 @@
+.owner-layout { display:flex; flex-direction:column; width:100%; height:100vh; height:100svh; min-height:0; overflow:hidden; background:#f7f8fc; color:#1b2240; box-sizing: border-box; }
+.header { position:sticky; top:0; z-index:20; display:flex; flex:0 0 58px; align-items:center; justify-content:space-between; box-sizing:border-box; height:58px; padding:0 23px; border-bottom:1px solid #eceef4; background:#fff; }
+.header h1 { display:flex; align-items:center; gap:7px; margin:0; color:#1d2342; font-size:17px; font-weight:750; letter-spacing:-.03em; }.header-brand-mark { color:#7057ee; font-size:20px; }
+.menu-toggle { display:none; border:0; background:transparent; color:#323957; font-size:22px; cursor:pointer; }
+.header-right { display:flex; align-items:center; gap:14px; }.header-user { display:grid; gap:1px; text-align:right; }.header-user strong { color:#343b57; font-size:11px; }.header-user small { color:#858ca0; font-size:9px; text-transform:capitalize; }
+.btn-logout { width:auto; padding:8px 13px; border:0; border-radius:8px; background:#f4f2ff; color:#654ddd; font-size:11px; font-weight:650; cursor:pointer; }.btn-logout:hover { background:#eae6ff; }
+.owner-workspace { display:flex; flex:1 1 0; width:100%; min-width:0; min-height:0; overflow:hidden; }
+.sidebar { position:relative; z-index:5; display:flex; flex:0 0 218px; flex-direction:column; width:218px; min-height:0; overflow:auto; padding:16px 12px; background:#111a32; color:#e9ebf5; }
+.sidebar-brand { display:flex; align-items:center; gap:9px; min-height:44px; margin:0 3px 21px; }.sidebar-brand>span { display:grid; width:32px; height:32px; place-items:center; border-radius:10px; background:#4538c8; color:#fff; font-size:19px; }.sidebar-brand div { display:grid; gap:2px; }.sidebar-brand strong { color:#fff; font-size:12px; }.sidebar-brand small { color:#919bb6; font-size:9px; }
+.sidebar nav { display:grid; gap:5px; }.nav-link { display:flex; align-items:center; gap:10px; min-height:38px; padding:0 10px; border-radius:9px; color:#b6bfd4; font-size:11px; text-decoration:none; transition:background .16s ease,color .16s ease; }.nav-link:hover { background:#202a47; color:#fff; }.nav-link.active { background:linear-gradient(100deg,#5848e8,#3e31c5); color:#fff; box-shadow:0 5px 14px #3426c94d; }.nav-icon { display:grid; width:18px; place-items:center; color:currentColor; font-size:15px; }
+.sidebar-footer { display:grid; gap:4px; margin-top:auto; padding:12px; border:1px solid #35415e; border-radius:11px; background:#18233e; }.sidebar-footer .plan-icon { color:#f3b63e; font-size:16px; }.sidebar-footer strong { color:#e8eaf2; font-size:10px; }.sidebar-footer small { color:#939eb7; font-size:9px; }
+.sidebar-overlay { display:none; }
+.main-content { display:flex; flex:1 1 0; flex-direction:column; width:calc(100% - 218px); min-width:0; min-height:0; padding:15px 17px 12px; overflow:auto; background:#f7f8fc; }
+.main-content > * { flex: 0 0 auto; min-height: auto; overflow: visible; }
+@media(max-width:900px) { .sidebar { flex-basis:190px; width:190px; }.main-content { width:calc(100% - 190px); padding:13px; } }
+@media(max-width:767px) { .header { flex-basis:54px; height:54px; padding:0 14px; }.menu-toggle { display:block; }.header h1 { margin-right:auto; margin-left:10px; font-size:15px; }.header-user { display:none; }.header-right { gap:0; }.btn-logout { padding:7px 11px; }.sidebar { position:fixed; z-index:100; top:54px; bottom:0; left:0; width:250px; height:auto; padding:15px 12px; transform:translateX(-101%); transition:transform .22s ease; box-shadow:10px 0 30px #10172c30; }.sidebar.open { transform:translateX(0); }.sidebar-overlay { position:fixed; z-index:99; inset:54px 0 0; display:block; width:100%; border:0; background:#10172c66; }.main-content { width:100%; padding:11px; } }
+
+/* Owner workspace visual refresh */
+.main-content {
+  background: linear-gradient(135deg, #f4f5ff 0%, #f8f9ff 52%, #f5f7fc 100%);
+}
+/* Pin the global app bar to the viewport; the reserved shell space keeps the
+   sidebar and content beginning directly beneath it. */
+.owner-layout { padding-top: 58px; }
+.owner-layout > .header { position: fixed; inset: 0 0 auto; width: 100%; }
+@media (max-width: 767px) {
+  .owner-layout { padding-top: 54px; }
+}
+
+/* Keep sidebar labels crisp and align the SVG icon set consistently. */
+.sidebar,
+.header,
+.menu-toggle {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+}
+.sidebar nav { gap: 6px; }
+.nav-link {
+  gap: 11px;
+  min-height: 42px;
+  padding: 0 11px;
+  font-size: 12px;
+  line-height: 1.25;
+}
+.nav-icon { width: 20px; height: 20px; flex: 0 0 20px; }
+.nav-icon svg { display: block; }
+.nav-label { min-width: 0; white-space: nowrap; }
+.header-brand-mark { display: inline-flex; align-items: center; }
+.menu-toggle { display: none; align-items: center; justify-content: center; }
+.sidebar-brand > span,
+.sidebar-footer .plan-icon { display: grid; place-items: center; }
+@media(max-width:767px) {
+  .menu-toggle { display: flex; }
+}
