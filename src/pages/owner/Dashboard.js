@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { dashboardAPI } from '../../api/dashboard';
 import { eventsAPI } from '../../api/events';
+import { notesAPI } from '../../api/notes';
+import useToast from '../../hooks/useToast';
 import './Dashboard.css';
 
 const money = (value) => `₹${Number(value || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
@@ -15,12 +17,30 @@ function EmptyState({ title, text }) {
   return <div className="dashboard-empty"><strong>{title}</strong><p>{text}</p></div>;
 }
 
+const noteColors = [
+  { id: 'amber', label: 'Amber', bg: '#fef3c7', border: '#fcd34d' },
+  { id: 'emerald', label: 'Emerald', bg: '#d1fae5', border: '#6ee7b7' },
+  { id: 'sky', label: 'Sky', bg: '#e0f2fe', border: '#7dd3fc' },
+  { id: 'violet', label: 'Violet', bg: '#ede9fe', border: '#c4b5fd' },
+  { id: 'rose', label: 'Rose', bg: '#ffe4e6', border: '#fda4af' },
+  { id: 'slate', label: 'Slate', bg: '#f1f5f9', border: '#cbd5e1' },
+];
+
 export default function Dashboard() {
   const { user } = useAuth();
+  const { showToast, ToastComponent } = useToast();
   const [overview, setOverview] = useState(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const [notes, setNotes] = useState([]);
+  const [notesLoading, setNotesLoading] = useState(true);
+  const [noteModal, setNoteModal] = useState(null);
+  const [noteForm, setNoteForm] = useState({ title: '', description: '', color: 'amber' });
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [deleteNoteId, setDeleteNoteId] = useState(null);
+
   const loadOverview = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -32,7 +52,93 @@ export default function Dashboard() {
       setError(err.response?.data?.message || 'Dashboard data could not be loaded.');
     } finally { setLoading(false); }
   }, []);
-  useEffect(() => { loadOverview(); }, [loadOverview]);
+
+  const loadNotes = useCallback(async () => {
+    setNotesLoading(true);
+    try {
+      const res = await notesAPI.getAll();
+      setNotes(res.data?.data || []);
+    } catch (err) {
+      console.error('Failed to load notes:', err);
+    } finally {
+      setNotesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOverview();
+    loadNotes();
+  }, [loadOverview, loadNotes]);
+
+  const openCreateNote = () => {
+    setNoteForm({ title: '', description: '', color: 'amber' });
+    setNoteModal({ mode: 'create' });
+  };
+
+  const openEditNote = (note) => {
+    setNoteForm({
+      title: note.title || '',
+      description: note.description || '',
+      color: note.color || 'amber',
+    });
+    setNoteModal({ mode: 'edit', note });
+  };
+
+  const closeNoteModal = () => {
+    if (noteSaving) return;
+    setNoteModal(null);
+    setNoteForm({ title: '', description: '', color: 'amber' });
+  };
+
+  const handleSaveNote = async (e) => {
+    e.preventDefault();
+    if (!noteForm.title.trim()) {
+      showToast('Note title is required', 'error');
+      return;
+    }
+    setNoteSaving(true);
+    try {
+      if (noteModal.mode === 'create') {
+        const res = await notesAPI.create(noteForm);
+        showToast(res.data?.message || 'Note created successfully', 'success');
+      } else {
+        const res = await notesAPI.update(noteModal.note._id, noteForm);
+        showToast(res.data?.message || 'Note updated successfully', 'success');
+      }
+      closeNoteModal();
+      await loadNotes();
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to save note', 'error');
+    } finally {
+      setNoteSaving(false);
+    }
+  };
+
+  const handleDeleteNote = async (id) => {
+    try {
+      await notesAPI.remove(id);
+      showToast('Note deleted successfully', 'success');
+      setDeleteNoteId(null);
+      await loadNotes();
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to delete note', 'error');
+    }
+  };
+
+  const formatNoteDate = (d) => {
+    if (!d) return '';
+    const date = new Date(d);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    if (isToday) {
+      return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    });
+  };
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -217,6 +323,80 @@ export default function Dashboard() {
         </article>
       </section>
 
+      {/* Quick Notes Section */}
+      <section className="dashboard-grid single-col-grid">
+        <article className="panel quick-notes-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>📌 Quick Notes</h3>
+              <p>Your private reminders, tasks, and academy notes</p>
+            </div>
+            <button
+              className="quick-notes-add-btn"
+              type="button"
+              onClick={openCreateNote}
+            >
+              ＋ Add Note
+            </button>
+          </div>
+
+          {notesLoading ? (
+            <Skeleton height={140} />
+          ) : notes.length === 0 ? (
+            <div className="quick-notes-empty">
+              <span className="empty-notes-icon">📝</span>
+              <strong>No notes saved yet</strong>
+              <p>Jot down quick thoughts, payment follow-ups, or batch reminders.</p>
+              <button
+                type="button"
+                className="quick-notes-empty-btn"
+                onClick={openCreateNote}
+              >
+                ＋ Create your first note
+              </button>
+            </div>
+          ) : (
+            <div className="quick-notes-grid">
+              {notes.map((note) => (
+                <div key={note._id} className={`note-card note-card-${note.color || 'amber'}`}>
+                  <div className="note-card-header">
+                    <h4 className="note-card-title">{note.title}</h4>
+                    <div className="note-card-actions">
+                      <button
+                        type="button"
+                        className="note-action-btn edit"
+                        title="Edit note"
+                        onClick={() => openEditNote(note)}
+                        aria-label="Edit note"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        type="button"
+                        className="note-action-btn delete"
+                        title="Delete note"
+                        onClick={() => setDeleteNoteId(note._id)}
+                        aria-label="Delete note"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                  {note.description && (
+                    <p className="note-card-desc">{note.description}</p>
+                  )}
+                  <div className="note-card-footer">
+                    <span className="note-card-date">
+                      {formatNoteDate(note.updatedAt || note.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
+      </section>
+
       <section className="dashboard-grid bottom-grid">
         <article className="panel">
           <div className="panel-heading"><div><h3>Admissions & growth</h3><p>Enrollment and fee activity by month</p></div><span className="panel-chip">Last 6 months</span></div>
@@ -237,6 +417,124 @@ export default function Dashboard() {
       <section className="dashboard-footer-grid">
         <div className="dashboard-account"><span className="account-avatar">{initials}</span><div><strong>{user?.name || 'Owner account'}</strong><span>{user?.email || 'Owner'}</span></div><span className="account-role">Owner</span></div>
       </section>
+
+      {/* Add / Edit Note Modal */}
+      {noteModal && (
+        <div className="note-modal-backdrop" role="presentation" onClick={closeNoteModal}>
+          <div className="note-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="note-modal-heading">
+              <div>
+                <span className="eyebrow">QUICK NOTE</span>
+                <h3>{noteModal.mode === 'create' ? 'Add Quick Note' : 'Edit Note'}</h3>
+              </div>
+              <button type="button" aria-label="Close" onClick={closeNoteModal} disabled={noteSaving}>
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSaveNote} className="note-form">
+              <div className="note-form-group">
+                <label htmlFor="note-title">Title *</label>
+                <input
+                  id="note-title"
+                  type="text"
+                  required
+                  maxLength={200}
+                  placeholder="e.g. Call parent of Aarav for demo class"
+                  value={noteForm.title}
+                  onChange={(e) => setNoteForm((prev) => ({ ...prev, title: e.target.value }))}
+                  autoFocus
+                />
+              </div>
+
+              <div className="note-form-group">
+                <label htmlFor="note-desc">Description</label>
+                <textarea
+                  id="note-desc"
+                  rows={4}
+                  maxLength={5000}
+                  placeholder="Details, checklist items, or phone numbers..."
+                  value={noteForm.description}
+                  onChange={(e) => setNoteForm((prev) => ({ ...prev, description: e.target.value }))}
+                />
+              </div>
+
+              <div className="note-form-group">
+                <label>Color Theme</label>
+                <div className="note-color-picker">
+                  {noteColors.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`color-choice-btn ${noteForm.color === c.id ? 'active' : ''}`}
+                      style={{ background: c.bg, borderColor: c.border }}
+                      onClick={() => setNoteForm((prev) => ({ ...prev, color: c.id }))}
+                      title={c.label}
+                    >
+                      {noteForm.color === c.id && <span className="color-check">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="note-modal-actions">
+                <button
+                  type="button"
+                  className="note-btn-secondary"
+                  onClick={closeNoteModal}
+                  disabled={noteSaving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="note-btn-primary"
+                  disabled={noteSaving || !noteForm.title.trim()}
+                >
+                  {noteSaving ? 'Saving…' : noteModal.mode === 'create' ? 'Save Note' : 'Update Note'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteNoteId && (
+        <div className="note-modal-backdrop" role="presentation" onClick={() => setDeleteNoteId(null)}>
+          <div className="note-modal note-delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="note-modal-heading">
+              <div>
+                <span className="eyebrow" style={{ color: '#ef4444' }}>DELETE NOTE</span>
+                <h3>Are you sure?</h3>
+              </div>
+              <button type="button" aria-label="Close" onClick={() => setDeleteNoteId(null)}>
+                ✕
+              </button>
+            </div>
+            <p className="delete-modal-text">
+              This note will be permanently removed from your dashboard.
+            </p>
+            <div className="note-modal-actions">
+              <button
+                type="button"
+                className="note-btn-secondary"
+                onClick={() => setDeleteNoteId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="note-btn-danger"
+                onClick={() => handleDeleteNote(deleteNoteId)}
+              >
+                Delete Note
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ToastComponent />
     </div>
   );
 }
