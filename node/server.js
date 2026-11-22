@@ -35,6 +35,7 @@ app.use('/api/settings', require('./routes/settings'));
 app.use('/api/teacher-events', require('./routes/teacherEvents'));
 app.use('/api/student', require('./routes/studentPortal'));
 app.use('/api/events', require('./routes/events'));
+app.use('/api/notes', require('./routes/notes'));
 
 // Health check
 app.get('/', (req, res) => {
